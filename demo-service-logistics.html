@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Service & Logistics - Will Power</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Hub Screen (Default View) -->
+        <div id="hub-view" class="view active">
+            <div class="header">
+                <h1>Service & Logistics</h1>
+            </div>
+            <div class="hub-menu">
+                <button class="menu-card" disabled>
+                    <span class="icon">🕐</span>
+                    <span class="text">Time Clock</span>
+                </button>
+                <button class="menu-card" onclick="showServiceForm()">
+                    <span class="icon">🔧</span>
+                    <span class="text">Report Breakdown</span>
+                </button>
+                <button class="menu-card" onclick="showTransportForm()">
+                    <span class="icon">🚚</span>
+                    <span class="text">Request Transport</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Service Request View -->
+        <div id="service-view" class="view">
+            <div class="header">
+                <button class="back-button" onclick="showHub()">
+                    <span>←</span>
+                    <span>Back</span>
+                </button>
+                <h1>Report Breakdown</h1>
+            </div>
+            <div class="form-container">
+                <form id="service-form" onsubmit="handleServiceSubmit(event)">
+                    <div class="form-group">
+                        <label for="asset-number">Asset Number</label>
+                        <input type="text" id="asset-number" name="asset-number" placeholder="Enter asset number" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Priority</label>
+                        <div class="priority-tiles">
+                            <div class="priority-tile" data-priority="1" onclick="selectPriority(1)">
+                                <span class="number">1</span>
+                                <span class="label">Critical</span>
+                            </div>
+                            <div class="priority-tile" data-priority="2" onclick="selectPriority(2)">
+                                <span class="number">2</span>
+                                <span class="label">High</span>
+                            </div>
+                            <div class="priority-tile" data-priority="3" onclick="selectPriority(3)">
+                                <span class="number">3</span>
+                                <span class="label">Medium</span>
+                            </div>
+                            <div class="priority-tile" data-priority="4" onclick="selectPriority(4)">
+                                <span class="number">4</span>
+                                <span class="label">Low</span>
+                            </div>
+                            <div class="priority-tile" data-priority="5" onclick="selectPriority(5)">
+                                <span class="number">5</span>
+                                <span class="label">Info</span>
+                            </div>
+                        </div>
+                        <input type="hidden" id="priority" name="priority" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="description">Description</label>
+                        <textarea id="description" name="description" placeholder="Describe the issue..." required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="photos">Photos</label>
+                        <div class="photo-upload" onclick="document.getElementById('service-photos').click()">
+                            <input type="file" id="service-photos" name="photos" multiple accept="image/*" onchange="handlePhotoPreview(event, 'service-preview')">
+                            <div class="camera-icon">📷</div>
+                            <div class="upload-text">Tap to add photos</div>
+                        </div>
+                        <div id="service-preview" class="photo-preview"></div>
+                    </div>
+                    <button type="submit" class="submit-button" id="service-submit">
+                        Submit Ticket
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Transport Request View -->
+        <div id="transport-view" class="view">
+            <div class="header">
+                <button class="back-button" onclick="showHub()">
+                    <span>←</span>
+                    <span>Back</span>
+                </button>
+                <h1>Schedule Transport</h1>
+            </div>
+            <div class="form-container">
+                <form id="transport-form" onsubmit="handleTransportSubmit(event)">
+                    <div class="form-group">
+                        <label for="equipment">Equipment or Material</label>
+                        <input type="text" id="equipment" name="equipment" placeholder="What are we moving?" required>
+                        <span class="note">Note: Asset ID is optional here.</span>
+                    </div>
+                    <div class="form-group">
+                        <label for="pickup-location">From (Pickup)</label>
+                        <div class="input-with-icon">
+                            <span class="icon">📍</span>
+                            <input type="text" id="pickup-location" name="pickup-location" placeholder="Pickup location" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="dropoff-location">To (Dropoff)</label>
+                        <div class="input-with-icon">
+                            <span class="icon">📍</span>
+                            <input type="text" id="dropoff-location" name="dropoff-location" placeholder="Dropoff location" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Timing</label>
+                        <div class="form-row">
+                            <div>
+                                <label for="pickup-time" style="font-size: var(--font-size-sm); margin-bottom: var(--spacing-xs); color: var(--text-label);">Pickup Time</label>
+                                <input type="datetime-local" id="pickup-time" name="pickup-time" required>
+                            </div>
+                            <div>
+                                <label for="dropoff-deadline" style="font-size: var(--font-size-sm); margin-bottom: var(--spacing-xs); color: var(--text-label);">Dropoff Deadline</label>
+                                <input type="datetime-local" id="dropoff-deadline" name="dropoff-deadline" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Priority</label>
+                        <div class="toggle-switch">
+                            <button type="button" class="active" onclick="toggleTransportPriority(this, 'standard')">Standard</button>
+                            <button type="button" onclick="toggleTransportPriority(this, 'urgent')">Urgent</button>
+                        </div>
+                        <input type="hidden" id="transport-priority" name="priority" value="standard">
+                    </div>
+                    <button type="submit" class="submit-button" id="transport-submit">
+                        Request Move
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Success View -->
+        <div id="success-view" class="view">
+            <div class="success-view">
+                <div class="success-icon">✓</div>
+                <div class="success-message">Request Received.<br>Dispatch Notified.</div>
+                <button class="return-button" onclick="showHub()">Return to Hub</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // View Management
+        function showView(viewId) {
+            document.querySelectorAll('.view').forEach(view => {
+                view.classList.remove('active');
+            });
+            document.getElementById(viewId).classList.add('active');
+        }
+
+        function showHub() {
+            showView('hub-view');
+            // Reset forms
+            document.getElementById('service-form').reset();
+            document.getElementById('transport-form').reset();
+            document.getElementById('service-preview').innerHTML = '';
+            // Reset priority selection
+            document.querySelectorAll('.priority-tile').forEach(tile => {
+                tile.classList.remove('selected');
+            });
+            document.getElementById('priority').value = '';
+        }
+
+        function showServiceForm() {
+            showView('service-view');
+        }
+
+        function showTransportForm() {
+            showView('transport-view');
+        }
+
+        function showSuccess() {
+            showView('success-view');
+        }
+
+        // Priority Selection
+        function selectPriority(priority) {
+            // Remove selected class from all tiles
+            document.querySelectorAll('.priority-tile').forEach(tile => {
+                tile.classList.remove('selected');
+            });
+            
+            // Add selected class to clicked tile
+            const selectedTile = document.querySelector(`[data-priority="${priority}"]`);
+            if (selectedTile) {
+                selectedTile.classList.add('selected');
+                document.getElementById('priority').value = priority;
+            }
+        }
+
+        // Transport Priority Toggle
+        function toggleTransportPriority(button, value) {
+            const toggle = button.parentElement;
+            toggle.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+            document.getElementById('transport-priority').value = value;
+        }
+
+        // Photo Preview
+        function handlePhotoPreview(event, previewId) {
+            const preview = document.getElementById(previewId);
+            preview.innerHTML = '';
+            const files = event.target.files;
+            
+            Array.from(files).forEach(file => {
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const img = document.createElement('img');
+                        img.src = e.target.result;
+                        preview.appendChild(img);
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+
+        // Form Submission with Loading Spinner
+        function showLoading(buttonId) {
+            const button = document.getElementById(buttonId);
+            button.disabled = true;
+            button.innerHTML = '<span class="spinner"></span>Submitting...';
+        }
+
+        function resetButton(buttonId, originalText) {
+            const button = document.getElementById(buttonId);
+            button.disabled = false;
+            button.innerHTML = originalText;
+        }
+
+        function handleServiceSubmit(event) {
+            event.preventDefault();
+            
+            // Validate priority selection
+            const priority = document.getElementById('priority').value;
+            if (!priority) {
+                alert('Please select a priority level');
+                return;
+            }
+            
+            const submitButton = document.getElementById('service-submit');
+            const originalText = submitButton.innerHTML;
+            
+            showLoading('service-submit');
+            
+            setTimeout(() => {
+                showSuccess();
+                resetButton('service-submit', originalText);
+            }, 1000);
+        }
+
+        function handleTransportSubmit(event) {
+            event.preventDefault();
+            const submitButton = document.getElementById('transport-submit');
+            const originalText = submitButton.innerHTML;
+            
+            showLoading('transport-submit');
+            
+            setTimeout(() => {
+                showSuccess();
+                resetButton('transport-submit', originalText);
+            }, 1000);
+        }
+    </script>
+</body>
+</html>
